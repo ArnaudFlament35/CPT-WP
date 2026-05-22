@@ -1,0 +1,9 @@
+# Configuration WP-CLI
+# Ce fichier est lu automatiquement quand tu utilises ./bin/wp ou make wp
+
+path: /var/www/html
+url: http://localhost:8080
+
+# Désactive les confirmations en mode dev
+require:
+  - /var/www/html/wp-load.php

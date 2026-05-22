@@ -1,0 +1,18 @@
+# Variables d'environnement (contient des mots de passe)
+.env
+
+# Uploads WordPress (médias, images)
+src/uploads/
+
+# Logs
+logs/
+
+# Dépendances installées (ne pas committer)
+src/themes/*/node_modules/
+src/themes/*/vendor/
+src/plugins/*/node_modules/
+src/plugins/*/vendor/
+
+# Fichiers système
+.DS_Store
+Thumbs.db

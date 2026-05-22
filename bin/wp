@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# Raccourci pour exécuter des commandes WP-CLI dans le container Docker.
+# Usage : ./bin/wp <commande wp-cli>
+# Exemple : ./bin/wp plugin list
+#           ./bin/wp theme activate mon-theme
+
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR/.."
+
+docker compose run --rm wpcli wp "$@"

@@ -1,0 +1,127 @@
+services:
+
+  # -------------------------------------------------------
+  # Base de données MariaDB
+  # -------------------------------------------------------
+  db:
+    image: mariadb:10.11
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - wp_network
+
+  # -------------------------------------------------------
+  # WordPress (Apache + PHP 8.2 + WP-CLI + Composer)
+  # -------------------------------------------------------
+  wordpress:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "${WP_PORT:-8080}:80"
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_NAME: ${DB_NAME}
+      WORDPRESS_DB_USER: ${DB_USER}
+      WORDPRESS_DB_PASSWORD: ${DB_PASSWORD}
+      WORDPRESS_DEBUG: "1"
+      WORDPRESS_CONFIG_EXTRA: |
+        define('WP_DEBUG_LOG', true);
+        define('WP_DEBUG_DISPLAY', true);
+        define('SCRIPT_DEBUG', true);
+        define('WP_MEMORY_LIMIT', '256M');
+        /* Configuration Mailhog pour les emails de test */
+        define('SMTP_HOST', 'mailhog');
+        define('SMTP_PORT', 1025);
+    volumes:
+      # Tes thèmes en développement (modifiables depuis l'hôte)
+      - ./src/themes:/var/www/html/wp-content/themes
+      # Tes plugins en développement (modifiables depuis l'hôte)
+      - ./src/plugins:/var/www/html/wp-content/plugins
+      # Les uploads (images, médias)
+      - ./src/uploads:/var/www/html/wp-content/uploads
+      # Volume partagé avec WP-CLI pour les fichiers WordPress core
+      - wordpress_data:/var/www/html
+      # Logs PHP
+      - ./logs:/var/log/php
+    networks:
+      - wp_network
+
+  # -------------------------------------------------------
+  # WP-CLI — interface en ligne de commande pour WordPress
+  # Utilisation : make wp <commande>  ou  ./bin/wp <commande>
+  # -------------------------------------------------------
+  wpcli:
+    image: wordpress:cli-php8.2
+    depends_on:
+      db:
+        condition: service_healthy
+      wordpress:
+        condition: service_started
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_NAME: ${DB_NAME}
+      WORDPRESS_DB_USER: ${DB_USER}
+      WORDPRESS_DB_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - wordpress_data:/var/www/html
+      - ./src/themes:/var/www/html/wp-content/themes
+      - ./src/plugins:/var/www/html/wp-content/plugins
+      - ./src/uploads:/var/www/html/wp-content/uploads
+    user: "33:33"
+    networks:
+      - wp_network
+
+  # -------------------------------------------------------
+  # phpMyAdmin — interface graphique pour la base de données
+  # Accès : http://localhost:8081
+  # -------------------------------------------------------
+  phpmyadmin:
+    image: phpmyadmin:latest
+    restart: unless-stopped
+    depends_on:
+      - db
+    ports:
+      - "${PMA_PORT:-8081}:80"
+    environment:
+      PMA_HOST: db
+      PMA_USER: ${DB_USER}
+      PMA_PASSWORD: ${DB_PASSWORD}
+      UPLOAD_LIMIT: 64M
+    networks:
+      - wp_network
+
+  # -------------------------------------------------------
+  # Mailhog — capture les emails envoyés par WordPress
+  # Interface : http://localhost:8025
+  # SMTP : port 1025
+  # -------------------------------------------------------
+  mailhog:
+    image: mailhog/mailhog:latest
+    restart: unless-stopped
+    ports:
+      - "${MAILHOG_PORT:-8025}:8025"
+      - "1025:1025"
+    networks:
+      - wp_network
+
+volumes:
+  db_data:
+  wordpress_data:
+
+networks:
+  wp_network:
+    driver: bridge
