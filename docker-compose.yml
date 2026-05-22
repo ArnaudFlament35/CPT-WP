@@ -38,6 +38,8 @@ services:
       WORDPRESS_DB_USER: ${DB_USER}
       WORDPRESS_DB_PASSWORD: ${DB_PASSWORD}
       WORDPRESS_DEBUG: "1"
+      LOCAL_UID: ${LOCAL_UID:-1000}
+      LOCAL_GID: ${LOCAL_GID:-1000}
       WORDPRESS_CONFIG_EXTRA: |
         define('WP_DEBUG_LOG', true);
         define('WP_DEBUG_DISPLAY', true);

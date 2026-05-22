@@ -19,7 +19,13 @@ RUN curl -sO https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cl
     && mv wp-cli.phar /usr/local/bin/wp
 
 # Config PHP pour le développement (erreurs visibles, logs activés)
-COPY .docker/php/dev.ini /usr/local/etc/php/conf.d/dev.ini
+COPY .docker/php/dev.ini /usr/local/etc/php/conf.d/zz-dev.ini
+
+# Entrypoint qui aligne l'uid www-data avec l'utilisateur hôte
+COPY .docker/entrypoint.sh /usr/local/bin/dev-entrypoint.sh
+RUN chmod +x /usr/local/bin/dev-entrypoint.sh
+
+ENTRYPOINT ["/usr/local/bin/dev-entrypoint.sh"]
 
 # Répertoire de travail WordPress
 WORKDIR /var/www/html

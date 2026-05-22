@@ -1,0 +1,39 @@
+{
+    "intelephense.stubs": [
+        "apache",
+        "bcmath",
+        "calendar",
+        "core",
+        "curl",
+        "date",
+        "dom",
+        "exif",
+        "fileinfo",
+        "filter",
+        "gd",
+        "hash",
+        "iconv",
+        "imagick",
+        "json",
+        "mbstring",
+        "mysqli",
+        "openssl",
+        "pcre",
+        "pdo",
+        "readline",
+        "session",
+        "simplexml",
+        "spl",
+        "standard",
+        "tokenizer",
+        "xml",
+        "xmlreader",
+        "xmlwriter",
+        "zip",
+        "zlib",
+        "wordpress"
+    ],
+    "intelephense.environment.includePaths": [
+        "./src/themes/twentytwentyfive-child-theme/vendor/php-stubs/wordpress-stubs"
+    ]
+}

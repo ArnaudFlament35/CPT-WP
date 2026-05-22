@@ -1,0 +1,15 @@
+/*
+ * Theme Name:  Twenty Twenty-Five Child Theme
+ * Description: Thème enfant de Twenty Twenty-Five
+ * Author:      Arnaud
+ * Author URI:  https://github.com/aflament
+ * Template:    twentytwentyfive
+ * Version:     1.0.0
+ * License:     GNU General Public License v2 or later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
+ * Text Domain: twentytwentyfive-child-theme
+ */
+body {
+    background-color: #be0c0c;
+    color: #fff;
+}
