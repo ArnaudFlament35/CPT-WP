@@ -78,3 +78,62 @@ function joueurs_register_meta() {
     }
 }
 add_action( 'init', 'joueurs_register_meta' );
+
+// --- Meta box : informations du joueur ---
+
+add_action( 'add_meta_boxes', 'joueurs_ajouter_meta_box' );
+function joueurs_ajouter_meta_box() {
+    add_meta_box(
+        'joueurs_infos',
+        'Informations du joueur',
+        'joueurs_afficher_meta_box',
+        'joueurs',
+        'normal',
+        'high'
+    );
+}
+
+function joueurs_afficher_meta_box( $post ) {
+    wp_nonce_field( 'joueurs_sauvegarder_meta', 'joueurs_meta_nonce' );
+
+    $date_naissance = get_post_meta( $post->ID, 'date_naissance', true );
+    $poste          = get_post_meta( $post->ID, 'poste', true );
+    $numero_prefere = get_post_meta( $post->ID, 'numero_prefere', true );
+    ?>
+    <p>
+        <label for="joueurs_date_naissance">Date de naissance</label><br>
+        <input type="date" id="joueurs_date_naissance" name="joueurs_date_naissance" value="<?php echo esc_attr( $date_naissance ); ?>">
+    </p>
+    <p>
+        <label for="joueurs_poste">Poste</label><br>
+        <input type="text" id="joueurs_poste" name="joueurs_poste" value="<?php echo esc_attr( $poste ); ?>">
+    </p>
+    <p>
+        <label for="joueurs_numero_prefere">Numéro préféré</label><br>
+        <input type="number" id="joueurs_numero_prefere" name="joueurs_numero_prefere" value="<?php echo esc_attr( $numero_prefere ); ?>">
+    </p>
+    <?php
+}
+
+add_action( 'save_post_joueurs', 'joueurs_sauvegarder_meta' );
+function joueurs_sauvegarder_meta( $post_id ) {
+    if ( ! isset( $_POST['joueurs_meta_nonce'] ) || ! wp_verify_nonce( $_POST['joueurs_meta_nonce'], 'joueurs_sauvegarder_meta' ) ) {
+        return;
+    }
+    if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+        return;
+    }
+    if ( ! current_user_can( 'edit_post', $post_id ) ) {
+        return;
+    }
+
+    if ( isset( $_POST['joueurs_date_naissance'] ) ) {
+        update_post_meta( $post_id, 'date_naissance', sanitize_text_field( $_POST['joueurs_date_naissance'] ) );
+    }
+    if ( isset( $_POST['joueurs_poste'] ) ) {
+        update_post_meta( $post_id, 'poste', sanitize_text_field( $_POST['joueurs_poste'] ) );
+    }
+    if ( isset( $_POST['joueurs_numero_prefere'] ) ) {
+        update_post_meta( $post_id, 'numero_prefere', absint( $_POST['joueurs_numero_prefere'] ) );
+    }
+}
