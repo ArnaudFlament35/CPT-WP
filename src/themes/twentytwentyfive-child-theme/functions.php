@@ -156,3 +156,44 @@ function joueurs_enregistrer_taxonomie_categorie() {
         'show_admin_column' => true,
     ) );
 }
+
+// --- Fonctions utilitaires : saison, catégorie, âge ---
+
+function joueurs_obtenir_annee_fin_saison() {
+    $aujourdhui     = new DateTime();
+    $annee_courante = (int) $aujourdhui->format( 'Y' );
+    $debut_saison   = DateTime::createFromFormat( 'Y-m-d', $annee_courante . '-09-01' );
+
+    if ( $aujourdhui < $debut_saison ) {
+        return $annee_courante;
+    }
+    return $annee_courante + 1;
+}
+
+function joueurs_calculer_categorie( $date_naissance ) {
+    if ( empty( $date_naissance ) ) {
+        return '';
+    }
+    $naissance = DateTime::createFromFormat( 'Y-m-d', $date_naissance );
+    if ( ! $naissance ) {
+        return '';
+    }
+
+    $annee_naissance  = (int) $naissance->format( 'Y' );
+    $annee_fin_saison = joueurs_obtenir_annee_fin_saison();
+
+    return 'U' . ( $annee_fin_saison - $annee_naissance );
+}
+
+function joueurs_calculer_age( $date_naissance ) {
+    if ( empty( $date_naissance ) ) {
+        return null;
+    }
+    $naissance = DateTime::createFromFormat( 'Y-m-d', $date_naissance );
+    if ( ! $naissance ) {
+        return null;
+    }
+
+    $aujourdhui = new DateTime();
+    return (int) $aujourdhui->diff( $naissance )->y;
+}
