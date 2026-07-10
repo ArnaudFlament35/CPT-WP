@@ -26,237 +26,180 @@ function twentytwentyfive_child_theme_setup()
 }
 // Ajout d'un cpt
 
-function twentytwentyfive_child_register_joueurs_post_types() {
-	// La déclaration de nos Custom Post Types et Taxonomies ira ici
-     // CPT Portfolio
-     $labels = array(
-        'name' => 'Joueurs',
-        'all_items' => 'Tous les joueurs',  // affiché dans le sous menu
-        'singular_name' => 'Joueur',
-        'add_new_item' => 'Ajouter un joueur',
-        'edit_item' => 'Modifier le joueur',
-        'menu_name' => 'Joueurs'
-    );
+// function twentytwentyfive_child_register_joueurs_post_types() {
+// 	// La déclaration de nos Custom Post Types et Taxonomies ira ici
+//      // CPT Portfolio
+//      $labels = array(
+//         'name' => 'Joueurs',
+//         'all_items' => 'Tous les joueurs',  // affiché dans le sous menu
+//         'singular_name' => 'Joueur',
+//         'add_new_item' => 'Ajouter un joueur',
+//         'edit_item' => 'Modifier le joueur',
+//         'menu_name' => 'Joueurs'
+//     );
 
-	$args = array(
-        'labels' => $labels,
-        'public' => true,
-        'show_in_rest' => true,
-        'has_archive' => true,
-        'supports' => array( 'title', 'editor','thumbnail' ),
-        'menu_position' => 5, 
-        'menu_icon' => 'dashicons-admin-BuddyPress',
-	);
+// 	$args = array(
+//         'labels' => $labels,
+//         'public' => true,
+//         'show_in_rest' => true,
+//         'has_archive' => true,
+//         'supports' => array( 'title', 'editor','thumbnail' ),
+//         'menu_position' => 5, 
+//         'menu_icon' => 'dashicons-admin-BuddyPress',
+// 	);
 
-	register_post_type( 'joueurs', $args );
-}
-add_action( 'init', 'twentytwentyfive_child_register_joueurs_post_types' );
-function joueurs_register_meta() {
-    $fields = array(
-        'date_naissance' => array(
-            'type'   => 'string',
-            'format' => 'date',
-        ),
-        'poste' => array(
-            'type' => 'string',
-        ),
-        'numero_prefere' => array(
-            'type' => 'integer',
-        ),
-    );
+// 	register_post_type( 'joueurs', $args );
+// }
+// add_action( 'init', 'twentytwentyfive_child_register_joueurs_post_types' );
+// function joueurs_register_meta() {
+//     $fields = array(
+//         'date_naissance' => array(
+//             'type'   => 'string',
+//             'format' => 'date',
+//         ),
+//         'poste' => array(
+//             'type' => 'string',
+//         ),
+//         'numero_prefere' => array(
+//             'type' => 'integer',
+//         ),
+//     );
 
-    foreach ( $fields as $key => $config ) {
-        register_post_meta( 'joueurs', $key, array(
-            'type'              => $config['type'],
-            'single'            => true,
-            'show_in_rest'      => true, // indispensable : expose le champ dans l'API REST + block editor
-            'sanitize_callback' => $config['type'] === 'integer' ? 'absint' : 'sanitize_text_field',
-            'auth_callback'     => function() {
-                return current_user_can( 'edit_posts' );
-            },
-        ) );
-    }
-}
-add_action( 'init', 'joueurs_register_meta' );
+//     foreach ( $fields as $key => $config ) {
+//         register_post_meta( 'joueurs', $key, array(
+//             'type'              => $config['type'],
+//             'single'            => true,
+//             'show_in_rest'      => true, // indispensable : expose le champ dans l'API REST + block editor
+//             'sanitize_callback' => $config['type'] === 'integer' ? 'absint' : 'sanitize_text_field',
+//             'auth_callback'     => function() {
+//                 return current_user_can( 'edit_posts' );
+//             },
+//         ) );
+//     }
+// }
+// add_action( 'init', 'joueurs_register_meta' );
 
-// --- Meta box : informations du joueur ---
 
-add_action( 'add_meta_boxes', 'joueurs_ajouter_meta_box' );
-function joueurs_ajouter_meta_box() {
-    add_meta_box(
-        'joueurs_infos',
-        'Informations du joueur',
-        'joueurs_afficher_meta_box',
-        'joueurs',
-        'normal',
-        'high'
-    );
-}
 
-function joueurs_afficher_meta_box( $post ) {
-    wp_nonce_field( 'joueurs_sauvegarder_meta', 'joueurs_meta_nonce' );
+// // --- Taxonomie : catégorie sportive du joueur (U13, U14...) ---
 
-    $date_naissance = get_post_meta( $post->ID, 'date_naissance', true );
-    $poste          = get_post_meta( $post->ID, 'poste', true );
-    $numero_prefere = get_post_meta( $post->ID, 'numero_prefere', true );
-    ?>
-    <p>
-        <label for="joueurs_date_naissance">Date de naissance</label><br>
-        <input type="date" id="joueurs_date_naissance" name="joueurs_date_naissance" value="<?php echo esc_attr( $date_naissance ); ?>">
-    </p>
-    <p>
-        <label for="joueurs_poste">Poste</label><br>
-        <input type="text" id="joueurs_poste" name="joueurs_poste" value="<?php echo esc_attr( $poste ); ?>">
-    </p>
-    <p>
-        <label for="joueurs_numero_prefere">Numéro préféré</label><br>
-        <input type="number" id="joueurs_numero_prefere" name="joueurs_numero_prefere" value="<?php echo esc_attr( $numero_prefere ); ?>">
-    </p>
-    <?php
-}
+// add_action( 'init', 'joueurs_enregistrer_taxonomie_categorie' );
+// function joueurs_enregistrer_taxonomie_categorie() {
+//     $labels = array(
+//         'name'          => 'Catégories',
+//         'singular_name' => 'Catégorie',
+//         'menu_name'     => 'Catégories',
+//     );
 
-add_action( 'save_post_joueurs', 'joueurs_sauvegarder_meta' );
-function joueurs_sauvegarder_meta( $post_id ) {
-    if ( ! isset( $_POST['joueurs_meta_nonce'] ) || ! wp_verify_nonce( $_POST['joueurs_meta_nonce'], 'joueurs_sauvegarder_meta' ) ) {
-        return;
-    }
-    if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
-        return;
-    }
-    if ( ! current_user_can( 'edit_post', $post_id ) ) {
-        return;
-    }
+//     register_taxonomy( 'categorie_joueur', 'joueurs', array(
+//         'labels'            => $labels,
+//         'hierarchical'      => true,
+//         'public'            => true,
+//         'show_in_rest'      => true,
+//         'show_admin_column' => true,
+//     ) );
+// }
 
-    if ( isset( $_POST['joueurs_date_naissance'] ) ) {
-        update_post_meta( $post_id, 'date_naissance', sanitize_text_field( $_POST['joueurs_date_naissance'] ) );
-    }
-    if ( isset( $_POST['joueurs_poste'] ) ) {
-        update_post_meta( $post_id, 'poste', sanitize_text_field( $_POST['joueurs_poste'] ) );
-    }
-    if ( isset( $_POST['joueurs_numero_prefere'] ) ) {
-        update_post_meta( $post_id, 'numero_prefere', absint( $_POST['joueurs_numero_prefere'] ) );
-    }
-}
+// // --- Fonctions utilitaires : saison, catégorie, âge ---
 
-// --- Taxonomie : catégorie sportive du joueur (U13, U14...) ---
+// function joueurs_obtenir_annee_fin_saison() {
+//     $aujourdhui     = new DateTime();
+//     $annee_courante = (int) $aujourdhui->format( 'Y' );
+//     $debut_saison   = DateTime::createFromFormat( 'Y-m-d', $annee_courante . '-09-01' );
 
-add_action( 'init', 'joueurs_enregistrer_taxonomie_categorie' );
-function joueurs_enregistrer_taxonomie_categorie() {
-    $labels = array(
-        'name'          => 'Catégories',
-        'singular_name' => 'Catégorie',
-        'menu_name'     => 'Catégories',
-    );
+//     if ( $aujourdhui < $debut_saison ) {
+//         return $annee_courante;
+//     }
+//     return $annee_courante + 1;
+// }
 
-    register_taxonomy( 'categorie_joueur', 'joueurs', array(
-        'labels'            => $labels,
-        'hierarchical'      => true,
-        'public'            => true,
-        'show_in_rest'      => true,
-        'show_admin_column' => true,
-    ) );
-}
+// function joueurs_calculer_categorie( $date_naissance ) {
+//     if ( empty( $date_naissance ) ) {
+//         return '';
+//     }
+//     $naissance = DateTime::createFromFormat( 'Y-m-d', $date_naissance );
+//     if ( ! $naissance ) {
+//         return '';
+//     }
 
-// --- Fonctions utilitaires : saison, catégorie, âge ---
+//     $annee_naissance  = (int) $naissance->format( 'Y' );
+//     $annee_fin_saison = joueurs_obtenir_annee_fin_saison();
 
-function joueurs_obtenir_annee_fin_saison() {
-    $aujourdhui     = new DateTime();
-    $annee_courante = (int) $aujourdhui->format( 'Y' );
-    $debut_saison   = DateTime::createFromFormat( 'Y-m-d', $annee_courante . '-09-01' );
+//     return 'U' . ( $annee_fin_saison - $annee_naissance );
+// }
 
-    if ( $aujourdhui < $debut_saison ) {
-        return $annee_courante;
-    }
-    return $annee_courante + 1;
-}
+// function joueurs_calculer_age( $date_naissance ) {
+//     if ( empty( $date_naissance ) ) {
+//         return null;
+//     }
+//     $naissance = DateTime::createFromFormat( 'Y-m-d', $date_naissance );
+//     if ( ! $naissance ) {
+//         return null;
+//     }
 
-function joueurs_calculer_categorie( $date_naissance ) {
-    if ( empty( $date_naissance ) ) {
-        return '';
-    }
-    $naissance = DateTime::createFromFormat( 'Y-m-d', $date_naissance );
-    if ( ! $naissance ) {
-        return '';
-    }
+//     $aujourdhui = new DateTime();
+//     return (int) $aujourdhui->diff( $naissance )->y;
+// }
 
-    $annee_naissance  = (int) $naissance->format( 'Y' );
-    $annee_fin_saison = joueurs_obtenir_annee_fin_saison();
+// // --- Assignation automatique de la catégorie ---
 
-    return 'U' . ( $annee_fin_saison - $annee_naissance );
-}
+// add_action( 'save_post_joueurs', 'joueurs_assigner_categorie', 20 );
+// function joueurs_assigner_categorie( $post_id ) {
+//     if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+//         return;
+//     }
 
-function joueurs_calculer_age( $date_naissance ) {
-    if ( empty( $date_naissance ) ) {
-        return null;
-    }
-    $naissance = DateTime::createFromFormat( 'Y-m-d', $date_naissance );
-    if ( ! $naissance ) {
-        return null;
-    }
+//     $date_naissance = get_post_meta( $post_id, 'date_naissance', true );
+//     $categorie      = joueurs_calculer_categorie( $date_naissance );
 
-    $aujourdhui = new DateTime();
-    return (int) $aujourdhui->diff( $naissance )->y;
-}
+//     if ( empty( $categorie ) ) {
+//         return;
+//     }
 
-// --- Assignation automatique de la catégorie ---
+//     wp_set_object_terms( $post_id, $categorie, 'categorie_joueur' );
+// }
 
-add_action( 'save_post_joueurs', 'joueurs_assigner_categorie', 20 );
-function joueurs_assigner_categorie( $post_id ) {
-    if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
-        return;
-    }
+// // --- Recalcul annuel des catégories (chaque 1er septembre) ---
 
-    $date_naissance = get_post_meta( $post_id, 'date_naissance', true );
-    $categorie      = joueurs_calculer_categorie( $date_naissance );
+// add_filter( 'cron_schedules', 'joueurs_ajouter_planification_annuelle' );
+// function joueurs_ajouter_planification_annuelle( $schedules ) {
+//     $schedules['yearly'] = array(
+//         'interval' => YEAR_IN_SECONDS,
+//         'display'  => 'Une fois par an',
+//     );
+//     return $schedules;
+// }
 
-    if ( empty( $categorie ) ) {
-        return;
-    }
+// add_action( 'after_switch_theme', 'joueurs_planifier_recalcul_categories' );
+// function joueurs_planifier_recalcul_categories() {
+//     if ( wp_next_scheduled( 'joueurs_recalculer_categories_event' ) ) {
+//         return;
+//     }
 
-    wp_set_object_terms( $post_id, $categorie, 'categorie_joueur' );
-}
+//     $annee             = (int) date( 'Y' );
+//     $prochaine_rentree = strtotime( $annee . '-09-01' );
 
-// --- Recalcul annuel des catégories (chaque 1er septembre) ---
+//     if ( $prochaine_rentree < time() ) {
+//         $prochaine_rentree = strtotime( ( $annee + 1 ) . '-09-01' );
+//     }
 
-add_filter( 'cron_schedules', 'joueurs_ajouter_planification_annuelle' );
-function joueurs_ajouter_planification_annuelle( $schedules ) {
-    $schedules['yearly'] = array(
-        'interval' => YEAR_IN_SECONDS,
-        'display'  => 'Une fois par an',
-    );
-    return $schedules;
-}
+//     wp_schedule_event( $prochaine_rentree, 'yearly', 'joueurs_recalculer_categories_event' );
+// }
 
-add_action( 'after_switch_theme', 'joueurs_planifier_recalcul_categories' );
-function joueurs_planifier_recalcul_categories() {
-    if ( wp_next_scheduled( 'joueurs_recalculer_categories_event' ) ) {
-        return;
-    }
+// add_action( 'switch_theme', 'joueurs_annuler_recalcul_categories' );
+// function joueurs_annuler_recalcul_categories() {
+//     wp_clear_scheduled_hook( 'joueurs_recalculer_categories_event' );
+// }
 
-    $annee             = (int) date( 'Y' );
-    $prochaine_rentree = strtotime( $annee . '-09-01' );
+// add_action( 'joueurs_recalculer_categories_event', 'joueurs_recalculer_toutes_categories' );
+// function joueurs_recalculer_toutes_categories() {
+//     $ids_joueurs = get_posts( array(
+//         'post_type'      => 'joueurs',
+//         'posts_per_page' => -1,
+//         'fields'         => 'ids',
+//     ) );
 
-    if ( $prochaine_rentree < time() ) {
-        $prochaine_rentree = strtotime( ( $annee + 1 ) . '-09-01' );
-    }
-
-    wp_schedule_event( $prochaine_rentree, 'yearly', 'joueurs_recalculer_categories_event' );
-}
-
-add_action( 'switch_theme', 'joueurs_annuler_recalcul_categories' );
-function joueurs_annuler_recalcul_categories() {
-    wp_clear_scheduled_hook( 'joueurs_recalculer_categories_event' );
-}
-
-add_action( 'joueurs_recalculer_categories_event', 'joueurs_recalculer_toutes_categories' );
-function joueurs_recalculer_toutes_categories() {
-    $ids_joueurs = get_posts( array(
-        'post_type'      => 'joueurs',
-        'posts_per_page' => -1,
-        'fields'         => 'ids',
-    ) );
-
-    foreach ( $ids_joueurs as $post_id ) {
-        joueurs_assigner_categorie( $post_id );
-    }
-}
+//     foreach ( $ids_joueurs as $post_id ) {
+//         joueurs_assigner_categorie( $post_id );
+//     }
+// }
