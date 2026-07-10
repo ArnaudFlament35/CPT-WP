@@ -207,3 +207,7 @@ absolument renvoyer le `$template` d'origine sans y toucher ?
   soit >=19) testé sur les bornes U18/Senior et sur des cas anciens : correct. Assignation
   automatique testée sur un vrai post (post 38, passage à Senior confirmé en base). Prochaine
   étape : Phase 4 (CPT entraineurs).
+- 2026-07-10 : fin de session. Phases 0 à 3 terminées et validées. Prochaine étape à la
+  reprise : Phase 4 (CPT `entraineurs`, pattern identique à `CPT_Joueurs` en Phase 1, support
+  `title` + `thumbnail` uniquement, classe `CPT_Entraineurs` dans
+  `includes/class-cpt-entraineurs.php`) — rien commencé sur cette phase pour l'instant.
