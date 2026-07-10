@@ -137,3 +137,22 @@ function joueurs_sauvegarder_meta( $post_id ) {
         update_post_meta( $post_id, 'numero_prefere', absint( $_POST['joueurs_numero_prefere'] ) );
     }
 }
+
+// --- Taxonomie : catégorie sportive du joueur (U13, U14...) ---
+
+add_action( 'init', 'joueurs_enregistrer_taxonomie_categorie' );
+function joueurs_enregistrer_taxonomie_categorie() {
+    $labels = array(
+        'name'          => 'Catégories',
+        'singular_name' => 'Catégorie',
+        'menu_name'     => 'Catégories',
+    );
+
+    register_taxonomy( 'categorie_joueur', 'joueurs', array(
+        'labels'            => $labels,
+        'hierarchical'      => true,
+        'public'            => true,
+        'show_in_rest'      => true,
+        'show_admin_column' => true,
+    ) );
+}
