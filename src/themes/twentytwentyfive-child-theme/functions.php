@@ -197,3 +197,21 @@ function joueurs_calculer_age( $date_naissance ) {
     $aujourdhui = new DateTime();
     return (int) $aujourdhui->diff( $naissance )->y;
 }
+
+// --- Assignation automatique de la catégorie ---
+
+add_action( 'save_post_joueurs', 'joueurs_assigner_categorie', 20 );
+function joueurs_assigner_categorie( $post_id ) {
+    if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+        return;
+    }
+
+    $date_naissance = get_post_meta( $post_id, 'date_naissance', true );
+    $categorie      = joueurs_calculer_categorie( $date_naissance );
+
+    if ( empty( $categorie ) ) {
+        return;
+    }
+
+    wp_set_object_terms( $post_id, $categorie, 'categorie_joueur' );
+}
