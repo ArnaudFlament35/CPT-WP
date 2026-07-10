@@ -215,3 +215,48 @@ function joueurs_assigner_categorie( $post_id ) {
 
     wp_set_object_terms( $post_id, $categorie, 'categorie_joueur' );
 }
+
+// --- Recalcul annuel des catégories (chaque 1er septembre) ---
+
+add_filter( 'cron_schedules', 'joueurs_ajouter_planification_annuelle' );
+function joueurs_ajouter_planification_annuelle( $schedules ) {
+    $schedules['yearly'] = array(
+        'interval' => YEAR_IN_SECONDS,
+        'display'  => 'Une fois par an',
+    );
+    return $schedules;
+}
+
+add_action( 'after_switch_theme', 'joueurs_planifier_recalcul_categories' );
+function joueurs_planifier_recalcul_categories() {
+    if ( wp_next_scheduled( 'joueurs_recalculer_categories_event' ) ) {
+        return;
+    }
+
+    $annee             = (int) date( 'Y' );
+    $prochaine_rentree = strtotime( $annee . '-09-01' );
+
+    if ( $prochaine_rentree < time() ) {
+        $prochaine_rentree = strtotime( ( $annee + 1 ) . '-09-01' );
+    }
+
+    wp_schedule_event( $prochaine_rentree, 'yearly', 'joueurs_recalculer_categories_event' );
+}
+
+add_action( 'switch_theme', 'joueurs_annuler_recalcul_categories' );
+function joueurs_annuler_recalcul_categories() {
+    wp_clear_scheduled_hook( 'joueurs_recalculer_categories_event' );
+}
+
+add_action( 'joueurs_recalculer_categories_event', 'joueurs_recalculer_toutes_categories' );
+function joueurs_recalculer_toutes_categories() {
+    $ids_joueurs = get_posts( array(
+        'post_type'      => 'joueurs',
+        'posts_per_page' => -1,
+        'fields'         => 'ids',
+    ) );
+
+    foreach ( $ids_joueurs as $post_id ) {
+        joueurs_assigner_categorie( $post_id );
+    }
+}
