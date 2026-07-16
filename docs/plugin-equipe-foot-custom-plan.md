@@ -116,25 +116,22 @@ base à ce moment-là.
 
 ---
 
-## Phase 4 — CPT `entraineurs` `[ ]`
+## Phase 4 — CPT `entraineurs` `[x]`
 
 **Objectif** : un second CPT simple (titre + photo), pour pratiquer la répétition du pattern
 de la Phase 1 sur un cas différent.
 
 **Exercices :**
-1. `[ ]` `includes/cpt-entraineurs.php` : `register_post_type( 'entraineurs' )`, support
-   `title` + `thumbnail` uniquement.
-2. `[ ]` Charger le fichier depuis `equipe-foot-custom.php`.
-3. `[ ]` Vérifier via `./bin/wp post create --post_type=entraineurs ...` et dans l'admin.
-
-**Question à te poser :** quelles parties du code de la Phase 1 se répètent presque à
-l'identique ici ? Est-ce qu'il y aurait une façon d'éviter la duplication (une fonction
-générique qui prend les labels en paramètre, par exemple) — pas obligatoire de le faire
-maintenant, mais réfléchis-y (DRY).
+1. `[x]` `includes/class-cpt-entraineurs.php` : `register_post_type( 'entraineurs' )`, support
+   `title` + `thumbnail` uniquement, classe `CPT_Entraineurs`.
+2. `[x]` Charger le fichier depuis `equipe-foot-custom.php`.
+3. `[x]` Lier la taxonomie `categorie_joueur` aux entraîneurs : second argument de
+   `register_taxonomy` passé en tableau `array( 'joueurs', 'entraineurs' )` — une seule
+   taxonomie partagée, cohérence des données garantie.
 
 ---
 
-## Phase 5 — Recalcul annuel (wp-cron) `[ ]`
+## Phase 5 — Recalcul annuel (wp-cron) `[x]`
 
 **Objectif** : le recalcul automatique des catégories chaque 1er septembre, comme dans le
 thème, mais déclenché différemment (un plugin n'a pas `after_switch_theme`).
@@ -211,3 +208,11 @@ absolument renvoyer le `$template` d'origine sans y toucher ?
   reprise : Phase 4 (CPT `entraineurs`, pattern identique à `CPT_Joueurs` en Phase 1, support
   `title` + `thumbnail` uniquement, classe `CPT_Entraineurs` dans
   `includes/class-cpt-entraineurs.php`) — rien commencé sur cette phase pour l'instant.
+- 2026-07-16 : Phase 4 terminée et validée. CPT `entraineurs` déclaré (`class-cpt-entraineurs.php`).
+  Taxonomie `categorie_joueur` étendue aux entraîneurs (second argument de `register_taxonomy`
+  en tableau). Prochaine étape : Phase 5 (recalcul annuel via wp-cron).
+- 2026-07-16 : Phase 5 terminée et validée. Classe `Cron_Recalcul` (`includes/class-cron-recalcul.php`).
+  Méthode statique `on_activate` pour la planification (appelée via `register_activation_hook`),
+  `register_deactivation_hook` pour le nettoyage. Événement `equipe_foot_custom_cron_recalcul`
+  confirmé via `./bin/wp cron event list` : planifié au 2026-09-01 00:00:00, récurrence 1 an.
+  Prochaine étape : Phase 6 (affichage front `single-joueurs.php`).
