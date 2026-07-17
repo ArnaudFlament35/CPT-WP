@@ -216,3 +216,49 @@ absolument renvoyer le `$template` d'origine sans y toucher ?
   `register_deactivation_hook` pour le nettoyage. Événement `equipe_foot_custom_cron_recalcul`
   confirmé via `./bin/wp cron event list` : planifié au 2026-09-01 00:00:00, récurrence 1 an.
   Prochaine étape : Phase 6 (affichage front `single-joueurs.php`).
+- 2026-07-17 : Phase 6 en cours. `templates/single-joueurs.php` créé (boucle standard +
+  affichage photo/date de naissance/poste/numéro préféré via `get_post_meta`). Filtre choisi :
+  `single_template` (variante acceptée par rapport à `template_include` prévu au plan — plus
+  ciblé puisque spécifique aux singles) dans `equipe-foot-custom.php`, fonction
+  `get_custom_post_type_template()`. Bugs trouvés et corrigés en session :
+  1) `require_once` du template directement dans `equipe-foot-custom.php` (en plus du filtre) —
+     exécutait le template au chargement du plugin, avant que `$wp_query` existe → fatal error
+     `get_queried_object() on null`. Supprimé, seul le filtre `single_template` doit charger le
+     template.
+  2) Site en thème par blocs (`twentytwentyfive-child-theme`, enfant de Twenty Twenty-Five, FSE)
+     sans `header.php`/`footer.php` classiques → `get_header()`/`get_footer()` génèrent des
+     avertissements "Deprecated". Décision : adapter le template pour construire le squelette
+     HTML à la main (`wp_head()`, `wp_body_open()`, `wp_footer()`) plutôt que changer de thème.
+  3) Balises `<html>`/`<body>` avec appel PHP inline (`language_attributes()`, `body_class()`)
+     sans le `>` de fermeture → structure HTML cassée, page noire. Corrigé.
+  4) Page blanche ensuite : fausse alerte, `the_content()` était juste vide sur le post de test
+     (normal, l'affichage doit venir des post meta, pas du contenu de l'article).
+  **Reste à corriger avant de valider la phase :** ligne du numéro préféré utilise la clé
+  `joueurs_numero_prefere` au lieu de `numero_prefere` (nom réel enregistré dans
+  `class-cpt-joueurs.php`) — le champ ne s'affiche pas à cause de cette faute de frappe.
+  Reste aussi à afficher âge et catégorie (via `Calculs_Joueurs` et la taxonomie) — pas encore
+  fait dans le template. Prochaine étape à la reprise : corriger la clé meta, ajouter âge +
+  catégorie à l'affichage, puis valider la Phase 6 en visitant une fiche joueur publiée.
+- 2026-07-17 : Phase 6 en cours. `templates/single-joueurs.php` créé (boucle standard +
+  affichage photo/date de naissance/poste/numéro préféré via `get_post_meta`). Filtre choisi :
+  `single_template` (variante acceptée par rapport à `template_include` prévu au plan — plus
+  ciblé puisque spécifique aux singles) dans `equipe-foot-custom.php`, fonction
+  `get_custom_post_type_template()`. Bugs trouvés et corrigés en session :
+  1) `require_once` du template directement dans `equipe-foot-custom.php` (en plus du filtre) —
+     exécutait le template au chargement du plugin, avant que `$wp_query` existe → fatal error
+     `get_queried_object() on null`. Supprimé, seul le filtre `single_template` doit charger le
+     template.
+  2) Site en thème par blocs (`twentytwentyfive-child-theme`, enfant de Twenty Twenty-Five, FSE)
+     sans `header.php`/`footer.php` classiques → `get_header()`/`get_footer()` génèrent des
+     avertissements "Deprecated". Décision : adapter le template pour construire le squelette
+     HTML à la main (`wp_head()`, `wp_body_open()`, `wp_footer()`) plutôt que changer de thème.
+  3) Balises `<html>`/`<body>` avec appel PHP inline (`language_attributes()`, `body_class()`)
+     sans le `>` de fermeture → structure HTML cassée, page noire. Corrigé.
+  4) Page blanche ensuite : fausse alerte, `the_content()` était juste vide sur le post de test
+     (normal, l'affichage doit venir des post meta, pas du contenu de l'article).
+  **Reste à corriger avant de valider la phase :** ligne du numéro préféré utilise la clé
+  `joueurs_numero_prefere` au lieu de `numero_prefere` (nom réel enregistré dans
+  `class-cpt-joueurs.php`) — le champ ne s'affiche pas à cause de cette faute de frappe.
+  Reste aussi à afficher âge et catégorie (via `Calculs_Joueurs` et la taxonomie) — pas encore
+  fait dans le template. Prochaine étape à la reprise : corriger la clé meta, ajouter âge +
+  catégorie à l'affichage, puis valider la Phase 6 en visitant une fiche joueur publiée.
